@@ -65,7 +65,7 @@ public class LBRServer extends RoboticsAPIApplication {
             client_names_);
         client_name_ = client_names_[id];
         getLogger().info("Remote address set to: " + client_name_);
-        
+
       // remote port
         id = getApplicationUI().displayModalDialog(
             ApplicationDialogType.QUESTION,
@@ -128,7 +128,7 @@ public class LBRServer extends RoboticsAPIApplication {
             });
       // try to connect
         try {
-            fri_session_.await(10, TimeUnit.SECONDS);
+            fri_session_.await(60, TimeUnit.SECONDS);
         } catch (final TimeoutException e) {
             getLogger().error(e.getLocalizedMessage());
             return;
