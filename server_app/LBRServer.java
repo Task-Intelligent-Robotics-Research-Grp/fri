@@ -13,6 +13,8 @@ import com.kuka.roboticsAPI.applicationModel.RoboticsAPIApplication;
 import com.kuka.roboticsAPI.controllerModel.Controller;
 import com.kuka.roboticsAPI.deviceModel.LBR;
 import com.kuka.roboticsAPI.geometricModel.CartDOF;
+// import com.kuka.roboticsAPI.geometricModel.ObjectFrame;
+// import com.kuka.roboticsAPI.geometricModel.Tool;
 import com.kuka.roboticsAPI.uiModel.ApplicationDialogType;
 import com.kuka.roboticsAPI.motionModel.controlModeModel.*;
 import com.kuka.connectivity.fastRobotInterface.*;
@@ -44,12 +46,12 @@ public class LBRServer extends RoboticsAPIApplication
 
   // FRI parameters
     private String client_name_;
-    private String[] client_names_   = {"172.31.1.10", "10.66.171.34"};
+    private String[] client_names_ = {"172.31.1.10", "10.66.171.34"};
     private int client_port_;
-    private String[] client_ports_   = {"30200", "30201", "30202",
-                                        "30203", "30204", "30205"};
+    private String[] client_ports_ = {"30200", "30201", "30202",
+                                      "30203", "30204", "30205"};
     private int send_period_;
-    private String[] send_periods_   = {"1", "2", "5", "10"};  // in ms
+    private String[] send_periods_ = {"1", "2", "5", "10"};  // in ms
 
   // JointImpedanceControlMode parameters
     private double joint_gain_  = 200.0;
@@ -169,8 +171,7 @@ public class LBRServer extends RoboticsAPIApplication
             new IFRISessionListener()
             {
                 @Override
-                public void
-                onFRISessionStateChanged(
+                public void onFRISessionStateChanged(
                     FRIChannelInformation friChannelInformation)
                 {
                     getLogger().info("Session State change "
@@ -179,8 +180,7 @@ public class LBRServer extends RoboticsAPIApplication
                 }
 
                 @Override
-                public void
-                onFRIConnectionQualityChanged(
+                public void onFRIConnectionQualityChanged(
                     FRIChannelInformation friChannelInformation)
                 {
                     getLogger().info("Quality change signalled "

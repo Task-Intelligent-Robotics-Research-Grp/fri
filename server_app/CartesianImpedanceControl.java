@@ -191,8 +191,8 @@ public class CartesianImpedanceControl extends RoboticsAPIApplication
                          + lbr_flange.getZ()/1000.0);
 
         lbr_controller_
-            = (Controller) getContext().getControllers().toArray()[0];
-        lbr_ = (LBR) lbr_controller_.getDevices().toArray()[0];
+            = (Controller)getContext().getControllers().toArray()[0];
+        lbr_ = (LBR)lbr_controller_.getDevices().toArray()[0];
         request_user_config();  // set FRI parameters
         configure_fri();        // configure the FRI
     }

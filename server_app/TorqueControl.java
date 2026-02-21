@@ -51,7 +51,7 @@ public class TorqueControl extends RoboticsAPIApplication
     private String[] client_ports_ = {"30200", "30201", "30202",
                                       "30203", "30204", "30205"};
     private int send_period_;
-    private String[] send_periods_ = {"1", "2", "5", "10"};  // send period in ms
+    private String[] send_periods_ = {"1", "2", "5", "10"};  // in ms
 
     private FRIConfiguration fri_configuration_;
     private FRISession fri_session_;
@@ -161,14 +161,15 @@ public class TorqueControl extends RoboticsAPIApplication
                          + lbr_flange.getZ()/1000.0);
 
         lbr_controller_
-            = (Controller) getContext().getControllers().toArray()[0];
-        lbr_ = (LBR) lbr_controller_.getDevices().toArray()[0];
+            = (Controller)getContext().getControllers().toArray()[0];
+        lbr_ = (LBR)lbr_controller_.getDevices().toArray()[0];
         request_user_config();  // set FRI parameters
         configure_fri();        // configure the FRI
     }
 
     @Override
-    public void run() {
+    public void run()
+    {
       // run the FRI
         lbr_.move(positionHold(control_mode_, -1, null)
                   .addMotionOverlay(fri_overlay_));
