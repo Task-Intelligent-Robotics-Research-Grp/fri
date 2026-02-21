@@ -42,8 +42,9 @@ public class CartesianImpedanceControl extends RoboticsAPIApplication {
     }
 
   // FRI parameters
+    private String client_name_;
     private String[] client_names_ = {"172.31.1.10", "10.66.171.34"};
-    private int client_port_ = 1;
+    private int client_port_;
     private String[] client_ports_ = {"30200", "30201", "30202", "30203", "30204", "30205"};
     private int send_period_;
     private String[] send_periods_ = {"1", "2", "5", "10"};  // send period in ms
@@ -81,11 +82,11 @@ public class CartesianImpedanceControl extends RoboticsAPIApplication {
         getLogger().info("Remote address set to: " + client_name_);
 
       // remote port
-        // id = getApplicationUI().displayModalDialog(
-        //     ApplicationDialogType.QUESTION,
-        //     "Select your remote port:",
-        //     client_ports_);
-        // client_port_ = Integer.valueOf(client_ports_[id]);
+        id = getApplicationUI().displayModalDialog(
+            ApplicationDialogType.QUESTION,
+            "Select your remote port:",
+            client_ports_);
+        client_port_ = Integer.valueOf(client_ports_[id]);
         getLogger().info("Remote port set to: " + client_port_);
 
         control_mode_= 	new CartesianImpedanceControlMode();
@@ -120,30 +121,25 @@ public class CartesianImpedanceControl extends RoboticsAPIApplication {
         fri_configuration_ = FRIConfiguration.createRemoteConfiguration(lbr_, client_name_);
         fri_configuration_.setPortOnRemote(client_port_);
         fri_configuration_.setSendPeriodMilliSec(send_period_);
-
         getLogger().info("Creating FRI connection to " + fri_configuration_.getHostName());
         getLogger().info(
             "SendPeriod: " + fri_configuration_.getSendPeriodMilliSec() + "ms |"
-            + " ReceiveMultiplier: " + fri_configuration_.getReceiveMultiplier()
-            );
-
+            + " ReceiveMultiplier: " + fri_configuration_.getReceiveMultiplier());
         fri_session_ = new FRISession(fri_configuration_);
         fri_overlay_ = new FRIJointOverlay(fri_session_, command_mode_);
-
         fri_session_.addFRISessionListener(new IFRISessionListener() {
-	    	@Override
-	    	public void onFRISessionStateChanged(FRIChannelInformation friChannelInformation) {
-                    getLogger().info("Session State change " + friChannelInformation.getFRISessionState().toString() );
-	    	}
+                @Override
+                public void onFRISessionStateChanged(FRIChannelInformation friChannelInformation) {
+                    getLogger().info("Session State change " + friChannelInformation.getFRISessionState().toString());
+                }
 
-	    	@Override
-	    	public void onFRIConnectionQualityChanged(FRIChannelInformation friChannelInformation) {
-                    getLogger().info("Quality change signalled "+friChannelInformation.getQuality());
-                    getLogger().info("Jitter "+friChannelInformation.getJitter());
-                    getLogger().info("Latency "+friChannelInformation.getLatency());
-	    	}
+                @Override
+                public void onFRIConnectionQualityChanged(FRIChannelInformation friChannelInformation) {
+                    getLogger().info("Quality change signalled " + friChannelInformation.getQuality());
+                    getLogger().info("Jitter " + friChannelInformation.getJitter());
+                    getLogger().info("Latency " + friChannelInformation.getLatency());
+                }
             });
-
       // try to connect
         try {
             fri_session_.await(60, TimeUnit.SECONDS);
@@ -167,7 +163,6 @@ public class CartesianImpedanceControl extends RoboticsAPIApplication {
 
       // set FRI parameters
         request_user_config();
-
       // configure the FRI
         configure_fri();
     }

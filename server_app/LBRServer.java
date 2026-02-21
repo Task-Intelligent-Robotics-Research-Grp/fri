@@ -131,6 +131,7 @@ public class LBRServer extends RoboticsAPIApplication {
             fri_session_.await(60, TimeUnit.SECONDS);
         } catch (final TimeoutException e) {
             getLogger().error(e.getLocalizedMessage());
+            getLogger().error("Connection timeout: Current Timeout limit = 60 sec");
             return;
         }
         getLogger().info("FRI connection established.");
