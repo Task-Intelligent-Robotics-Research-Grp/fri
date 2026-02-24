@@ -30,7 +30,16 @@ public class LBRServer extends RoboticsAPIApplication
     // @Named("Tool")
     // private Tool mytool_;
 
-  // control mode
+  // command mode
+    private enum COMMAND_MODE
+    {
+    	NO_COMMAND_MODE,
+        POSITION,
+        WRENCH,
+        TORQUE;
+    }
+
+    // control mode
     private enum CONTROL_MODE
     {
         POSITION_CONTROL,
@@ -45,17 +54,18 @@ public class LBRServer extends RoboticsAPIApplication
     }
 
   // FRI parameters
+	private String[] client_names_ = {"172.31.1.10", "10.66.171.34"};
     private String client_name_;
-    private String[] client_names_ = {"172.31.1.10", "10.66.171.34"};
-    private int client_port_;
     private String[] client_ports_ = {"30200", "30201", "30202",
                                       "30203", "30204", "30205"};
-    private int send_period_;
+    private int client_port_;
     private String[] send_periods_ = {"1", "2", "5", "10"};  // in ms
-
+    private int send_period_;
+    
   // JointImpedanceControlMode parameters
-    private double joint_gain_  = 200.0;
-
+    private String[] joint_gains_ = {"0.0", "200.0", "400.0"};
+    private double joint_gain_;
+    
   // CartesianImpedanceControlMode parameters
     private double[] cart_stiffness_ = {1000.0, 1000.0, 1000.0,
                                         30.0, 30.0, 30.0};
@@ -68,89 +78,110 @@ public class LBRServer extends RoboticsAPIApplication
     private FRIJointOverlay fri_overlay_;
 
     private AbstractMotionControlMode control_mode_;
-    private String[] control_modes_ = getNames(CONTROL_MODE.class);
     private ClientCommandMode command_mode_;
-    private String[] command_modes_ = getNames(ClientCommandMode.class);
 
   // methods
     public void request_user_config()
     {
-      // send period
-        int id = getApplicationUI().displayModalDialog(
-            ApplicationDialogType.QUESTION,
-            "Select the desired FRI send period [ms]:",
-            send_periods_);
-        send_period_ = Integer.valueOf(send_periods_[id]);
-        getLogger().info("Send period set to: " + send_period_);
-
-      // remote IP address
-        id = getApplicationUI().displayModalDialog(
+        // remote IP address
+    	int id = getApplicationUI().displayModalDialog(
             ApplicationDialogType.QUESTION,
             "Select your remote IP address:",
             client_names_);
         client_name_ = client_names_[id];
         getLogger().info("Remote address set to: " + client_name_);
 
-      // remote port
-        id = getApplicationUI().displayModalDialog(
+        // remote port
+    	id = getApplicationUI().displayModalDialog(
             ApplicationDialogType.QUESTION,
             "Select your remote port:",
             client_ports_);
         client_port_ = Integer.valueOf(client_ports_[id]);
         getLogger().info("Remote port set to: " + client_port_);
 
-      // control mode
-        id = getApplicationUI().displayModalDialog(
-            ApplicationDialogType.QUESTION,
-            "Select the desired FRI control mode: ",
-            control_modes_);
-        CONTROL_MODE control_mode = CONTROL_MODE.values()[id];
-        switch (control_mode)
-        {
-          case POSITION_CONTROL:
-            control_mode_ = new PositionControlMode();
-            break;
-          case JOINT_IMPEDANCE_CONTROL:
-            control_mode_
-                = new JointImpedanceControlMode(joint_gain_, joint_gain_,
-                                                joint_gain_, joint_gain_,
-                                                joint_gain_, joint_gain_,
-                                                joint_gain_);
-            break;
-          case CARTESIAN_IMPEDANCE_CONTROL:
-          {
-            CartesianImpedanceControlMode mode
-                = new CartesianImpedanceControlMode();
-            mode.parametrize(CartDOF.X).setStiffness(cart_stiffness_[0]);
-            mode.parametrize(CartDOF.Y).setStiffness(cart_stiffness_[1]);
-            mode.parametrize(CartDOF.Z).setStiffness(cart_stiffness_[2]);
-            mode.parametrize(CartDOF.A).setStiffness(cart_stiffness_[3]);
-            mode.parametrize(CartDOF.B).setStiffness(cart_stiffness_[4]);
-            mode.parametrize(CartDOF.C).setStiffness(cart_stiffness_[5]);
-            mode.parametrize(CartDOF.X).setDamping(cart_dumping_);
-            mode.parametrize(CartDOF.Y).setDamping(cart_dumping_);
-            mode.parametrize(CartDOF.Z).setDamping(cart_dumping_);
-            mode.parametrize(CartDOF.A).setDamping(cart_dumping_);
-            mode.parametrize(CartDOF.B).setDamping(cart_dumping_);
-            mode.parametrize(CartDOF.C).setDamping(cart_dumping_);
-            mode.setNullSpaceStiffness(ns_stiffness_);
-            mode.setNullSpaceDamping(ns_dumping_);
-          //mode.setMaxControlForce(10.0, 10.0, 10.0, 2.0, 2.0, 2.0, false);
-            control_mode_ = mode;
-          }
-            break;
-        }
-        getLogger().info("Control mode set to: " + control_mode.name());
-
-      // command mode
+		// client command mode
         id = getApplicationUI().displayModalDialog(
             ApplicationDialogType.QUESTION,
             "Select the desired FRI client command mode: ",
-            command_modes_);
+            getNames(ClientCommandMode.class));
         command_mode_ = ClientCommandMode.values()[id];
         getLogger().info("Client command mode set to: "
                          + command_mode_.name());
-    }
+        
+        // FRI control mode
+        CONTROL_MODE control_mode;
+        switch (COMMAND_MODE.values()[id])
+        {
+  	      case NO_COMMAND_MODE:
+          case POSITION:
+          default:
+          	id = getApplicationUI().displayModalDialog(
+        			ApplicationDialogType.QUESTION,
+        			"Select the desired FRI control mode: ",
+        			getNames(CONTROL_MODE.class));
+          	control_mode = CONTROL_MODE.values()[id];
+        	break;
+      	  case TORQUE:
+      		control_mode = CONTROL_MODE.JOINT_IMPEDANCE_CONTROL;
+      		break;
+      	  case WRENCH:
+      		control_mode = CONTROL_MODE.CARTESIAN_IMPEDANCE_CONTROL;
+      		break;
+        }
+        
+    	switch (control_mode)
+    	{
+    	  case POSITION_CONTROL:
+    	  default:
+    		control_mode_ = new PositionControlMode();
+    		break;
+    	  case JOINT_IMPEDANCE_CONTROL:
+    	    id = getApplicationUI().displayModalDialog(
+    	            ApplicationDialogType.QUESTION,
+    	            "Select the desired FRI joint gain:",
+    	            joint_gains_);
+    	    joint_gain_ = Float.valueOf(joint_gains_[id]);
+    	    getLogger().info("Joint gain set to: " + joint_gain_);
+        	control_mode_
+        		= new JointImpedanceControlMode(joint_gain_, joint_gain_,
+        				                        joint_gain_, joint_gain_,
+        				                        joint_gain_, joint_gain_,
+        				                        joint_gain_);
+    		break;
+    	  case CARTESIAN_IMPEDANCE_CONTROL:
+    	  {
+    		CartesianImpedanceControlMode mode
+    		    = new CartesianImpedanceControlMode();
+    		mode.parametrize(CartDOF.X).setStiffness(cart_stiffness_[0]);
+    		mode.parametrize(CartDOF.Y).setStiffness(cart_stiffness_[1]);
+    		mode.parametrize(CartDOF.Z).setStiffness(cart_stiffness_[2]);
+    		mode.parametrize(CartDOF.A).setStiffness(cart_stiffness_[3]);
+    		mode.parametrize(CartDOF.B).setStiffness(cart_stiffness_[4]);
+    		mode.parametrize(CartDOF.C).setStiffness(cart_stiffness_[5]);
+    		mode.parametrize(CartDOF.X).setDamping(cart_dumping_);
+    		mode.parametrize(CartDOF.Y).setDamping(cart_dumping_);
+    		mode.parametrize(CartDOF.Z).setDamping(cart_dumping_);
+    		mode.parametrize(CartDOF.A).setDamping(cart_dumping_);
+    		mode.parametrize(CartDOF.B).setDamping(cart_dumping_);
+    		mode.parametrize(CartDOF.C).setDamping(cart_dumping_);
+    		mode.setNullSpaceStiffness(ns_stiffness_);
+    		mode.setNullSpaceDamping(ns_dumping_);
+    		//mode.setMaxControlForce(10.0, 10.0, 10.0, 2.0, 2.0, 2.0, false);
+    		control_mode_ = mode;
+    	  }
+    	    break;
+        }
+        getLogger().info("Control mode set to: " + control_mode.name());
+
+        // send period
+        id = getApplicationUI().displayModalDialog(
+            ApplicationDialogType.QUESTION,
+            "Select the desired FRI send period [ms]:",
+            send_periods_);
+        send_period_ = Integer.valueOf(send_periods_[id]);
+        getLogger().info("Send period set to: " + send_period_);
+}
+
 
     public void configure_fri()
     {
