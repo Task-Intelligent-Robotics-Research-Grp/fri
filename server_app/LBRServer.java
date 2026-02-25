@@ -83,32 +83,32 @@ public class LBRServer extends RoboticsAPIApplication
   // methods
     public void request_user_config()
     {
-        // remote IP address
+      // remote IP address
         int id = getApplicationUI().displayModalDialog(
-            ApplicationDialogType.QUESTION,
-            "Select your remote IP address:",
-            client_names_);
+                     ApplicationDialogType.QUESTION,
+                     "Select your remote IP address:",
+                     client_names_);
         client_name_ = client_names_[id];
         getLogger().info("Remote address set to: " + client_name_);
 
-        // remote port
+      // remote port
         id = getApplicationUI().displayModalDialog(
-            ApplicationDialogType.QUESTION,
-            "Select your remote port:",
-            client_ports_);
+                 ApplicationDialogType.QUESTION,
+                 "Select your remote port:",
+                 client_ports_);
         client_port_ = Integer.valueOf(client_ports_[id]);
         getLogger().info("Remote port set to: " + client_port_);
 
-                // client command mode
+      // client command mode
         id = getApplicationUI().displayModalDialog(
-            ApplicationDialogType.QUESTION,
-            "Select the desired FRI client command mode: ",
-            getNames(ClientCommandMode.class));
+                 ApplicationDialogType.QUESTION,
+                 "Select the desired FRI client command mode: ",
+                 getNames(ClientCommandMode.class));
         command_mode_ = ClientCommandMode.values()[id];
         getLogger().info("Client command mode set to: "
                          + command_mode_.name());
 
-        // FRI control mode
+      // FRI control mode
         CONTROL_MODE control_mode;
         switch (COMMAND_MODE.values()[id])
         {
@@ -116,9 +116,9 @@ public class LBRServer extends RoboticsAPIApplication
           case POSITION:
           default:
             id = getApplicationUI().displayModalDialog(
-                ApplicationDialogType.QUESTION,
-                "Select the desired FRI control mode: ",
-                getNames(CONTROL_MODE.class));
+                     ApplicationDialogType.QUESTION,
+                     "Select the desired FRI control mode: ",
+                     getNames(CONTROL_MODE.class));
             control_mode = CONTROL_MODE.values()[id];
             break;
           case TORQUE:
@@ -137,9 +137,9 @@ public class LBRServer extends RoboticsAPIApplication
             break;
           case JOINT_IMPEDANCE_CONTROL:
             id = getApplicationUI().displayModalDialog(
-                ApplicationDialogType.QUESTION,
-                "Select the desired FRI joint gain:",
-                joint_gains_);
+                     ApplicationDialogType.QUESTION,
+                     "Select the desired FRI joint gain:",
+                     joint_gains_);
             joint_gain_ = Float.valueOf(joint_gains_[id]);
             getLogger().info("Joint gain set to: " + joint_gain_);
             control_mode_
@@ -150,8 +150,8 @@ public class LBRServer extends RoboticsAPIApplication
             break;
           case CARTESIAN_IMPEDANCE_CONTROL:
           {
-            CartesianImpedanceControlMode mode
-                = new CartesianImpedanceControlMode();
+            CartesianImpedanceControlMode
+                mode = new CartesianImpedanceControlMode();
             mode.parametrize(CartDOF.X).setStiffness(cart_stiffness_[0]);
             mode.parametrize(CartDOF.Y).setStiffness(cart_stiffness_[1]);
             mode.parametrize(CartDOF.Z).setStiffness(cart_stiffness_[2]);
@@ -173,11 +173,11 @@ public class LBRServer extends RoboticsAPIApplication
         }
         getLogger().info("Control mode set to: " + control_mode.name());
 
-        // send period
+      // send period
         id = getApplicationUI().displayModalDialog(
-            ApplicationDialogType.QUESTION,
-            "Select the desired FRI send period [ms]:",
-            send_periods_);
+                 ApplicationDialogType.QUESTION,
+                 "Select the desired FRI send period [ms]:",
+                 send_periods_);
         send_period_ = Integer.valueOf(send_periods_[id]);
         getLogger().info("Send period set to: " + send_period_);
     }
@@ -222,6 +222,7 @@ public class LBRServer extends RoboticsAPIApplication
                                      + friChannelInformation.getLatency());
                 }
             });
+
       // try to connect
         try
         {
@@ -239,12 +240,12 @@ public class LBRServer extends RoboticsAPIApplication
     @Override
     public void initialize()
     {
-        // ObjectFrame lbr_flange = lbr_.getFlange();
-        // mytool_.attachTo(lbr_flange);
-        // getLogger().info("End Effector position:"
-        //                  + lbr_flange.getX()/1000.0 + " "
-        //                  + lbr_flange.getY()/1000.0 + " "
-        //                  + lbr_flange.getZ()/1000.0);
+      // ObjectFrame lbr_flange = lbr_.getFlange();
+      // mytool_.attachTo(lbr_flange);
+      // getLogger().info("End Effector position:"
+      //                  + lbr_flange.getX()/1000.0 + " "
+      //                  + lbr_flange.getY()/1000.0 + " "
+      //                  + lbr_flange.getZ()/1000.0);
 
         lbr_controller_
             = (Controller)getContext().getControllers().toArray()[0];
