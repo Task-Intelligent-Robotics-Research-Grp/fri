@@ -13,8 +13,8 @@ import com.kuka.roboticsAPI.applicationModel.RoboticsAPIApplication;
 import com.kuka.roboticsAPI.controllerModel.Controller;
 import com.kuka.roboticsAPI.deviceModel.LBR;
 import com.kuka.roboticsAPI.geometricModel.CartDOF;
-// import com.kuka.roboticsAPI.geometricModel.ObjectFrame;
-// import com.kuka.roboticsAPI.geometricModel.Tool;
+import com.kuka.roboticsAPI.geometricModel.ObjectFrame;
+import com.kuka.roboticsAPI.geometricModel.Tool;
 import com.kuka.roboticsAPI.uiModel.ApplicationDialogType;
 import com.kuka.roboticsAPI.motionModel.controlModeModel.*;
 import com.kuka.connectivity.fastRobotInterface.*;
@@ -26,9 +26,9 @@ public class LBRServer extends RoboticsAPIApplication
     private LBR lbr_;
     private Controller lbr_controller_;
 
-    // @Inject
-    // @Named("Tool")
-    // private Tool mytool_;
+    @Inject
+    @Named("Tool")
+    private Tool mytool_;
 
   // command mode
     private enum COMMAND_MODE
@@ -240,12 +240,12 @@ public class LBRServer extends RoboticsAPIApplication
     @Override
     public void initialize()
     {
-      // ObjectFrame lbr_flange = lbr_.getFlange();
-      // mytool_.attachTo(lbr_flange);
-      // getLogger().info("End Effector position:"
-      //                  + lbr_flange.getX()/1000.0 + " "
-      //                  + lbr_flange.getY()/1000.0 + " "
-      //                  + lbr_flange.getZ()/1000.0);
+        ObjectFrame lbr_flange = lbr_.getFlange();
+        mytool_.attachTo(lbr_flange);
+        getLogger().info("End Effector position:"
+                         + lbr_flange.getX()/1000.0 + " "
+                         + lbr_flange.getY()/1000.0 + " "
+                         + lbr_flange.getZ()/1000.0);
 
         lbr_controller_
             = (Controller)getContext().getControllers().toArray()[0];
